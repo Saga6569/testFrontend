@@ -31,10 +31,16 @@ jobs:
    - name: Test
      run: npm test
 
-  # Опционально: деплой на GitHub Pages
-  # - name: Deploy to GitHub Pages
-  #   if: github.ref == 'refs/heads/main'
-  #   uses: peaceiris/actions-gh-pages@v3
-  #   with:
-  #     github_token: ${{ secrets.GITHUB_TOKEN }}
-  #     publish_dir: ./dist
+   - name: Build for production
+     run: npm run build
+     env:
+       NODE_ENV: production
+
+   - name: Deploy to GitHub Pages
+     if: github.ref == 'refs/heads/main'
+     uses: peaceiris/actions-gh-pages@v3
+     with:
+       github_token: ${{ secrets.GITHUB_TOKEN }}
+       publish_dir: ./dist
+       commit_message: ${{ github.event.head_commit.message }}
+       force_orphan: true
