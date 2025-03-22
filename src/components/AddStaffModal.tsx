@@ -22,6 +22,7 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PatternFormat } from 'react-number-format'
 import { Employee } from '../models/Employee'
+import { InferType } from 'yup'
 
 interface AddStaffModalProps {
  open: boolean
@@ -30,51 +31,22 @@ interface AddStaffModalProps {
  isEdit?: boolean
 }
 
-interface IFormInput {
- surname: string
- name: string
- patronymic: string
- adminPosition: string
- roles: (string | undefined)[]
- medicalPosition: string
- department: string
- phone: string
- email: string
- hireDate: Date | null
-}
-
 const phoneRegExp = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/
 
-const validationSchema = yup.object().shape({
- surname: yup.string().required('Фамилия обязательна'),
- name: yup.string().required('Имя обязательно'),
- patronymic: yup.string().required('Отчество обязательно'),
+const validationSchema = yup.object({
+ phone: yup.string().required('Введите телефон'),
+ email: yup.string().email('Неверный формат email').required('Введите email'),
+ name: yup.string().required('Введите имя'),
+ surname: yup.string().required('Введите фамилию'),
+ patronymic: yup.string().required('Введите отчество'),
  adminPosition: yup.string().required('Выберите административную должность'),
- roles: yup.array(yup.string()).strict().required('Выберите роли').min(1, 'Выберите хотя бы одну роль'),
+ roles: yup.array().of(yup.string()).min(1, 'Выберите роли').defined(),
  medicalPosition: yup.string().required('Выберите медицинскую должность'),
- department: yup.string().required('Выберите подразделение'),
- phone: yup
-  .string()
-  .required('Телефон обязателен')
-  .transform((value) => {
-    // Убираем все нецифровые символы
-    const digits = value.replace(/\D/g, '');
-    // Форматируем в нужный вид
-    if (digits.length === 11) {
-      return `+7 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9)}`;
-    }
-    return value;
-  })
-  .matches(phoneRegExp, 'Введите номер в формате +7 (###) ###-##-##'),
- email: yup
-  .string()
-  .required('Email обязателен')
-  .email('Неверный формат email'),
- hireDate: yup
-  .date()
-  .required('Дата принятия на работу обязательна')
-  .nullable(),
+ department: yup.string().required('Выберите отделение'),
+ hireDate: yup.date().defined().required('Выберите дату приема'),
 })
+
+type IFormInput = InferType<typeof validationSchema>
 
 const AddStaffModal: React.FC<AddStaffModalProps> = ({
  open,
@@ -88,19 +60,32 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
   formState: { errors },
   reset
  } = useForm<IFormInput>({
-  resolver: yupResolver(validationSchema),
-  defaultValues: {
-   surname: initialData?.surname || '',
-   name: initialData?.name || '',
-   patronymic: initialData?.patronymic || '',
-   adminPosition: initialData?.adminPosition || '',
-   roles: initialData?.roles?.filter((role): role is string => role !== undefined) || [],
-   medicalPosition: initialData?.medical_position?.value || '',
-   department: initialData?.department?.value || '',
-   phone: initialData?.phone || '',
-   email: initialData?.email || '',
-   hireDate: initialData?.hired_at ? new Date(initialData.hired_at * 1000) : null,
-  },
+  defaultValues: initialData
+    ? {
+        phone: initialData.phone,
+        email: initialData.email,
+        name: initialData.name,
+        surname: initialData.surname,
+        patronymic: initialData.patronymic,
+        adminPosition: initialData.adminPosition || '',
+        roles: initialData.roles || [],
+        medicalPosition: initialData.medical_position?.value || '',
+        department: initialData.department?.value || '',
+        hireDate: new Date(+initialData.hired_at * 1000),
+      }
+    : {
+        phone: '',
+        email: '',
+        name: '',
+        surname: '',
+        patronymic: '',
+        adminPosition: '',
+        roles: [],
+        medicalPosition: '',
+        department: '',
+        hireDate: new Date(),
+      },
+  resolver: yupResolver<IFormInput>(validationSchema),
  })
 
  React.useEffect(() => {
@@ -349,24 +334,18 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
        name="hireDate"
        control={control}
        render={({ field }) => (
-        <FormControl fullWidth size="small" error={!!errors.hireDate}>
+        <FormControl fullWidth error={!!errors.hireDate}>
          <DatePicker
-          selected={field.value}
-          onChange={(date) => field.onChange(date)}
+          selected={field.value instanceof Date ? field.value : null}
+          onChange={(date: Date | null) => field.onChange(date || new Date())}
           dateFormat="dd.MM.yyyy"
           locale={ru}
           placeholderText="Выберите дату"
-          customInput={
-           <TextField
-            fullWidth
-            label="Дата принятия на работу"
-            size="small"
-            error={!!errors.hireDate}
-            helperText={errors.hireDate?.message}
-            sx={{ bgcolor: '#fff' }}
-           />
-          }
+          customInput={<TextField fullWidth error={!!errors.hireDate} />}
          />
+         {errors.hireDate && (
+          <FormHelperText>{errors.hireDate.message}</FormHelperText>
+         )}
         </FormControl>
        )}
       />

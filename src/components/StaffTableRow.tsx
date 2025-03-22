@@ -1,4 +1,5 @@
 import React from 'react'
+import { createPortal } from 'react-dom'
 import {
  TableRow,
  TableCell,
@@ -8,8 +9,6 @@ import {
  Tooltip,
  Button,
 } from '@mui/material'
-import DatePicker from 'react-datepicker'
-import { ru } from 'date-fns/locale'
 import {
  Edit as EditIcon,
  Delete as DeleteIcon,
@@ -242,50 +241,36 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
     <Checkbox />
    </TableCell>
    <TableCell className="table-cell">
-    <DatePicker
-     dateFormat="dd.MM.yyyy"
-     locale={ru}
-     readOnly
-     customInput={
-      <div
-       style={{
-        color: 'rgba(0, 0, 0, 0.87)',
-        fontSize: '0.875rem',
-        fontFamily: '"Roboto","Helvetica","Arial",sans-serif',
-        fontWeight: 400,
-        lineHeight: 1.43,
-       }}
-      >
-       <div className="table-item">
-        {new Date(+member.hired_at * 1000).toLocaleDateString('ru')}
-       </div>
-      </div>
-     }
-    />
+    <div
+     style={{
+      color: 'rgba(0, 0, 0, 0.87)',
+      fontSize: '0.875rem',
+      fontFamily: '"Roboto","Helvetica","Arial",sans-serif',
+      fontWeight: 400,
+      lineHeight: 1.43,
+     }}
+    >
+     <div className="table-item">
+      {new Date(+member.hired_at * 1000).toLocaleDateString('ru')}
+     </div>
+    </div>
    </TableCell>
    <TableCell className="table-cell">
-    <DatePicker
-     dateFormat="dd.MM.yyyy"
-     locale={ru}
-     readOnly
-     customInput={
-      <div
-       style={{
-        color: 'rgba(0, 0, 0, 0.87)',
-        fontSize: '0.875rem',
-        fontFamily: '"Roboto","Helvetica","Arial",sans-serif',
-        fontWeight: 400,
-        lineHeight: 1.43,
-       }}
-      >
-       <div className="table-item">
-        {member.fired_at === null
-         ? 'работает'
-         : new Date(+member.fired_at * 1000).toLocaleDateString('ru')}
-       </div>
-      </div>
-     }
-    />
+    <div
+     style={{
+      color: 'rgba(0, 0, 0, 0.87)',
+      fontSize: '0.875rem',
+      fontFamily: '"Roboto","Helvetica","Arial",sans-serif',
+      fontWeight: 400,
+      lineHeight: 1.43,
+     }}
+    >
+     <div className="table-item">
+      {member.fired_at === null
+       ? 'работает'
+       : new Date(+member.fired_at * 1000).toLocaleDateString('ru')}
+     </div>
+    </div>
    </TableCell>
 
    <TableCell className="table-cell">
@@ -296,6 +281,7 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
        setTypeModal('fire')
        setDismissModalOpen(true)
       }}
+      data-testid="fire-button"
       sx={{
        marginRight: '20px',
        bgcolor: '#FFF2F2',
@@ -320,6 +306,7 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
     <IconButton
      size="small"
      onClick={() => staffStore.removeStaffMember(member.id)}
+     data-testid="delete-button"
     >
      <DeleteIcon
       onClick={() => {
@@ -343,18 +330,24 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
  return (
   <>
    {tableRowContent}
-   <ConfirmationModal
-    open={dismissModalOpen}
-    onClose={() => setDismissModalOpen(false)}
-    onConfirm={handleDismiss}
-    typeModal={typeModal}
-   />
-   <AddStaffModal
-    open={editModalOpen}
-    onClose={() => setEditModalOpen(false)}
-    initialData={member}
-    isEdit
-   />
+   {createPortal(
+    <>
+     <ConfirmationModal
+      open={dismissModalOpen}
+      onClose={() => setDismissModalOpen(false)}
+      onConfirm={handleDismiss}
+      typeModal={typeModal}
+      data-testid="confirmation-modal"
+     />
+     <AddStaffModal
+      open={editModalOpen}
+      onClose={() => setEditModalOpen(false)}
+      initialData={member}
+      isEdit
+     />
+    </>,
+    document.getElementById('modal-root') || document.body
+   )}
   </>
  )
 }
