@@ -1,0 +1,61 @@
+.table-cell {
+ padding: 16px;
+ font-size: 0.875rem;
+ font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+ font-weight: 400;
+ line-height: 1.43;
+ color: rgba(0, 0, 0, 0.87);
+
+ white-space: nowrap;
+ overflow: hidden;
+ text-overflow: ellipsis;
+}
+
+.table-item {
+ width: 108px;
+ height: 56px;
+ display: block;
+ white-space: nowrap;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ padding: 16px 0px 16px 0px;
+ font-size: 16px;
+}
+
+.react-datepicker-wrapper {
+ width: auto;
+}
+
+.react-datepicker__input-container div {
+ cursor: default;
+}
+
+.checkbox-cell {
+ padding: 0 12px;
+}
+
+.cell-header {
+ color: red;
+}
+.cell-copy {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+}
+
+.items-copy {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ width: 108px;
+ height: 56px;
+}
+
+.items-copy button:focus {
+  outline: none;
+}
+
+.table-item.phone {
+  font-family: monospace;
+  letter-spacing: 0.5px;
+}
