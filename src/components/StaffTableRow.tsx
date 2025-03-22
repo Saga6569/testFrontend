@@ -18,6 +18,7 @@ import {
 import { Employee } from '../models/Employee'
 import ConfirmationModal, { ModalType } from './ConfirmationModal'
 import AddStaffModal from './AddStaffModal'
+import { staffStore } from '../store/StaffStore'
 
 interface StaffTableRowProps {
  member: Employee
@@ -141,7 +142,6 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
  }
 
  const handleDismiss = () => {
-  // Здесь будет логика увольнения
   setDismissModalOpen(false)
  }
 
@@ -307,6 +307,7 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
      size="small"
      onClick={() => {
       setTypeModal('delete')
+      staffStore.removeStaffMember(member.id)
       setDismissModalOpen(true)
      }}
      data-testid="delete-button"

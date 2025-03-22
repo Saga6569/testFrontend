@@ -17,6 +17,7 @@ const StaffSelect: React.FC<StaffSelectProps> = observer(
    <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
     <Autocomplete<Employee, true>
      multiple
+     disableCloseOnSelect
      options={staffStore.staffMembers}
      value={selectedStaff}
      onChange={(_, newValue) => onStaffChange(newValue)}
@@ -72,6 +73,7 @@ const StaffSelect: React.FC<StaffSelectProps> = observer(
 
     <Autocomplete<string, true>
      multiple
+     disableCloseOnSelect
      options={[
       'Руководитель МО',
       'Уполномоченное лицо',
