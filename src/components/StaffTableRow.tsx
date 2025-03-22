@@ -300,6 +300,7 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
     <IconButton
      size="small"
      onClick={() => setEditModalOpen(true)}
+     aria-label="Редактировать сотрудника"
     >
      <EditIcon />
     </IconButton>
@@ -307,21 +308,19 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
      size="small"
      onClick={() => staffStore.removeStaffMember(member.id)}
      data-testid="delete-button"
+     aria-label="Удалить сотрудника"
     >
-     <DeleteIcon
-      onClick={() => {
-       setTypeModal('delete')
-       setDismissModalOpen(true)
-      }}
-     />
+     <DeleteIcon />
     </IconButton>
-    <IconButton size="small">
-     <LockIcon
-      onClick={() => {
-       setTypeModal('blocking')
-       setDismissModalOpen(true)
-      }}
-     />
+    <IconButton
+     size="small"
+     onClick={() => {
+      setTypeModal('blocking')
+      setDismissModalOpen(true)
+     }}
+     aria-label="Заблокировать сотрудника"
+    >
+     <LockIcon />
     </IconButton>
    </TableCell>
   </TableRow>
