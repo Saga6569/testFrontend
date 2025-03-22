@@ -16,7 +16,6 @@ import {
  ContentCopy as CopyIcon,
 } from '@mui/icons-material'
 import { Employee } from '../models/Employee'
-import { staffStore } from '../store/StaffStore'
 import ConfirmationModal, { ModalType } from './ConfirmationModal'
 import AddStaffModal from './AddStaffModal'
 
@@ -306,7 +305,10 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
     </IconButton>
     <IconButton
      size="small"
-     onClick={() => staffStore.removeStaffMember(member.id)}
+     onClick={() => {
+      setTypeModal('delete')
+      setDismissModalOpen(true)
+     }}
      data-testid="delete-button"
      aria-label="Удалить сотрудника"
     >
