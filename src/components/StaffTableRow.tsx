@@ -14,7 +14,6 @@ import {
  Edit as EditIcon,
  Delete as DeleteIcon,
  Lock as LockIcon,
- Visibility as VisibilityIcon,
  ContentCopy as CopyIcon,
 } from '@mui/icons-material'
 import { Employee } from '../models/Employee'

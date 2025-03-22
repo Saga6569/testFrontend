@@ -19,4 +19,4 @@ export interface Employee {
   roles?: string[];
 }
 
-export interface EmployeeFormData extends Omit<Employee, 'id'> {}
+export type EmployeeFormData = Omit<Employee, 'id'>

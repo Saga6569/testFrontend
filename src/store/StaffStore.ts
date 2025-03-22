@@ -18,7 +18,7 @@ class StaffStore {
   get availableRoles() {
     const roles = new Set<string>();
     this.staffMembers.forEach(member => {
-      member.roles.forEach(role => roles.add(role));
+      member.roles?.forEach(role => roles.add(role));
     });
     return Array.from(roles);
   }
@@ -33,7 +33,7 @@ class StaffStore {
         this.staffMembers = response.data.items
         this.isLoading = false;
       });
-    } catch (error) {
+    } catch {
       runInAction(() => {
         this.error = 'Ошибка при загрузке данных';
         this.isLoading = false;
@@ -65,7 +65,7 @@ class StaffStore {
         this.staffMembers.push(newMember);
         this.isLoading = false;
       });
-    } catch (error) {
+    } catch {
       runInAction(() => {
         this.error = 'Ошибка при добавлении сотрудника';
         this.isLoading = false;
@@ -101,7 +101,7 @@ class StaffStore {
         }
         this.isLoading = false;
       });
-    } catch (error) {
+    } catch {
       runInAction(() => {
         this.error = 'Ошибка при обновлении данных сотрудника';
         this.isLoading = false;

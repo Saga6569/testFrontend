@@ -14,8 +14,17 @@ const api = ky.create({
 // Интерфейс для ответа API
 interface ApiResponse<T> {
  data: T
- meta?: any
- links?: any
+ meta?: {
+  total: number
+  page: number
+  per_page: number
+ }
+ links?: {
+  first: string
+  last: string
+  prev: string | null
+  next: string | null
+ }
 }
 
 // API для работы с сотрудниками
@@ -26,7 +35,6 @@ export const employeeApi = {
   const url = 'api/v1/users'
 
   let response
-  let lastError
 
   try {
    const rawResponse = await api.get(url)
@@ -35,7 +43,6 @@ export const employeeApi = {
    return response
   } catch (error) {
    console.warn(`URL ${url} не работает:`, error)
-   lastError = error
   }
 
   console.warn('Не удалось получить данные из ответа:', response)
@@ -45,13 +52,8 @@ export const employeeApi = {
  // Получение одного сотрудника по ID
  async getById(id: string): Promise<Employee> {
   try {
-   const response = await api.get(`api/v1/users/${id}`).json<any>()
-
-   if (response && response.data) {
-    return response.data
-   }
-
-   return response
+   const response = await api.get(`api/v1/users/${id}`).json<ApiResponse<Employee>>()
+   return response.data
   } catch (error) {
    console.error(`Ошибка при получении сотрудника с ID ${id}:`, error)
    throw error
@@ -63,13 +65,8 @@ export const employeeApi = {
   try {
    const response = await api
     .post('api/v1/users', { json: employee })
-    .json<any>()
-
-   if (response && response.data) {
-    return response.data
-   }
-
-   return response
+    .json<ApiResponse<Employee>>()
+   return response.data
   } catch (error) {
    console.error('Ошибка при создании сотрудника:', error)
    throw error
@@ -84,13 +81,8 @@ export const employeeApi = {
   try {
    const response = await api
     .put(`api/v1/users/${id}`, { json: employee })
-    .json<any>()
-
-   if (response && response.data) {
-    return response.data
-   }
-
-   return response
+    .json<ApiResponse<Employee>>()
+   return response.data
   } catch (error) {
    console.error(`Ошибка при обновлении сотрудника с ID ${id}:`, error)
    throw error
@@ -115,13 +107,8 @@ export const employeeApi = {
   try {
    const response = await api
     .patch(`api/v1/users/${id}/status`, { json: { status } })
-    .json<any>()
-
-   if (response && response.data) {
-    return response.data
-   }
-
-   return response
+    .json<ApiResponse<Employee>>()
+   return response.data
   } catch (error) {
    console.error(`Ошибка при изменении статуса сотрудника с ID ${id}:`, error)
    throw error
