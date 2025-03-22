@@ -31,8 +31,6 @@ interface AddStaffModalProps {
  isEdit?: boolean
 }
 
-const phoneRegExp = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/
-
 const validationSchema = yup.object({
  phone: yup.string().required('Введите телефон'),
  email: yup.string().email('Неверный формат email').required('Введите email'),
@@ -52,56 +50,60 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
  open,
  onClose,
  initialData,
- isEdit = false
+ isEdit = false,
 }) => {
  const {
   control,
   handleSubmit,
   formState: { errors },
-  reset
+  reset,
  } = useForm<IFormInput>({
   defaultValues: initialData
-    ? {
-        phone: initialData.phone,
-        email: initialData.email,
-        name: initialData.name,
-        surname: initialData.surname,
-        patronymic: initialData.patronymic,
-        adminPosition: initialData.adminPosition || '',
-        roles: initialData.roles || [],
-        medicalPosition: initialData.medical_position?.value || '',
-        department: initialData.department?.value || '',
-        hireDate: new Date(+initialData.hired_at * 1000),
-      }
-    : {
-        phone: '',
-        email: '',
-        name: '',
-        surname: '',
-        patronymic: '',
-        adminPosition: '',
-        roles: [],
-        medicalPosition: '',
-        department: '',
-        hireDate: new Date(),
-      },
+   ? {
+      phone: initialData.phone,
+      email: initialData.email,
+      name: initialData.name,
+      surname: initialData.surname,
+      patronymic: initialData.patronymic,
+      adminPosition: initialData.adminPosition || '',
+      roles: initialData.roles || [],
+      medicalPosition: initialData.medical_position?.value || '',
+      department: initialData.department?.value || '',
+      hireDate: new Date(+initialData.hired_at * 1000),
+     }
+   : {
+      phone: '',
+      email: '',
+      name: '',
+      surname: '',
+      patronymic: '',
+      adminPosition: '',
+      roles: [],
+      medicalPosition: '',
+      department: '',
+      hireDate: new Date(),
+     },
   resolver: yupResolver<IFormInput>(validationSchema),
  })
 
  React.useEffect(() => {
   if (initialData && isEdit) {
-    reset({
-      surname: initialData.surname,
-      name: initialData.name,
-      patronymic: initialData.patronymic,
-      adminPosition: initialData.adminPosition,
-      roles: initialData.roles?.filter((role): role is string => role !== undefined) || [],
-      medicalPosition: initialData.medical_position?.value,
-      department: initialData.department?.value,
-      phone: initialData.phone,
-      email: initialData.email,
-      hireDate: initialData.hired_at ? new Date(initialData.hired_at * 1000) : null,
-    })
+   reset({
+    surname: initialData.surname,
+    name: initialData.name,
+    patronymic: initialData.patronymic,
+    adminPosition: initialData.adminPosition,
+    roles:
+     initialData.roles?.filter((role): role is string => role !== undefined) ||
+     [],
+    medicalPosition: initialData.medical_position?.value,
+    department: initialData.department?.value,
+    phone: initialData.phone,
+    email: initialData.email,
+    hireDate: initialData.hired_at
+     ? new Date(initialData.hired_at * 1000)
+     : undefined,
+   })
   }
  }, [initialData, isEdit, reset])
 
@@ -222,7 +224,9 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
            {...field}
            multiple
            label="Роли"
-           value={field.value.filter((role): role is string => role !== undefined)}
+           value={field.value.filter(
+            (role): role is string => role !== undefined
+           )}
            renderValue={(selected: string[]) => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
              {selected.map((value: string) => (
@@ -260,7 +264,12 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
         )}
        </FormControl>
       </Box>
-      <FormControl fullWidth size="small" error={!!errors.medicalPosition} sx={{ bgcolor: '#fff' }}>
+      <FormControl
+       fullWidth
+       size="small"
+       error={!!errors.medicalPosition}
+       sx={{ bgcolor: '#fff' }}
+      >
        <InputLabel>Медицинская должность</InputLabel>
        <Controller
         name="medicalPosition"
@@ -276,7 +285,12 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
         <FormHelperText>{errors.medicalPosition.message}</FormHelperText>
        )}
       </FormControl>
-      <FormControl fullWidth size="small" error={!!errors.department} sx={{ bgcolor: '#fff' }}>
+      <FormControl
+       fullWidth
+       size="small"
+       error={!!errors.department}
+       sx={{ bgcolor: '#fff' }}
+      >
        <InputLabel>Подразделение</InputLabel>
        <Controller
         name="department"
