@@ -6,6 +6,11 @@ export interface Employee {
   phone: string;
   email: string;
   password?: string;
+  adminPosition?: string;
+  department?: {
+    label: string;
+    value: string;
+  };
   medical_position: {
     label: string;
     value: string;

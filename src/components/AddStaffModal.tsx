@@ -35,7 +35,7 @@ interface IFormInput {
  name: string
  patronymic: string
  adminPosition: string
- roles: string[]
+ roles: (string | undefined)[]
  medicalPosition: string
  department: string
  phone: string
@@ -94,7 +94,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
    name: initialData?.name || '',
    patronymic: initialData?.patronymic || '',
    adminPosition: initialData?.adminPosition || '',
-   roles: initialData?.roles || [],
+   roles: initialData?.roles?.filter((role): role is string => role !== undefined) || [],
    medicalPosition: initialData?.medical_position?.value || '',
    department: initialData?.department?.value || '',
    phone: initialData?.phone || '',
@@ -110,7 +110,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
       name: initialData.name,
       patronymic: initialData.patronymic,
       adminPosition: initialData.adminPosition,
-      roles: initialData.roles,
+      roles: initialData.roles?.filter((role): role is string => role !== undefined) || [],
       medicalPosition: initialData.medical_position?.value,
       department: initialData.department?.value,
       phone: initialData.phone,
@@ -237,6 +237,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
            {...field}
            multiple
            label="Роли"
+           value={field.value.filter((role): role is string => role !== undefined)}
            renderValue={(selected: string[]) => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
              {selected.map((value: string) => (
