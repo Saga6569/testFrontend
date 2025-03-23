@@ -70,7 +70,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     sx: {
      borderRadius: '8px',
      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-    }
+    },
    }}
    aria-labelledby="confirmation-dialog-title"
    disableEnforceFocus
