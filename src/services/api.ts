@@ -1,5 +1,5 @@
 import ky from 'ky'
-import { Employee, EmployeeFormData } from '../models/Employee'
+import { Employee, EmployeeFormData, EmployeeFormDataAdd } from '../types/Employee'
 
 // Базовый URL API
 const API_URL = 'https://api.mock.sb21.ru'
@@ -27,11 +27,9 @@ interface ApiResponse<T> {
  }
 }
 
-// API для работы с сотрудниками
+
 export const employeeApi = {
- // Получение списка всех сотрудников
  async getAll(): Promise<ApiResponse<Employee[]>> {
-  // Пробуем несколько вариантов URL для получения данных
   const url = 'api/v1/users'
 
   let response
@@ -52,7 +50,9 @@ export const employeeApi = {
  // Получение одного сотрудника по ID
  async getById(id: string): Promise<Employee> {
   try {
-   const response = await api.get(`api/v1/users/${id}`).json<ApiResponse<Employee>>()
+   const response = await api
+    .get(`api/v1/users/${id}`)
+    .json<ApiResponse<Employee>>()
    return response.data
   } catch (error) {
    console.error(`Ошибка при получении сотрудника с ID ${id}:`, error)
@@ -61,7 +61,7 @@ export const employeeApi = {
  },
 
  // Создание нового сотрудника
- async create(employee: EmployeeFormData): Promise<Employee> {
+ async create(employee: EmployeeFormDataAdd): Promise<Employee> {
   try {
    const response = await api
     .post('api/v1/users', { json: employee })

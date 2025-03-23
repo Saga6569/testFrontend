@@ -1,54 +1,104 @@
-# React + TypeScript + Vite
+# Система управления персоналом
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Веб-приложение для управления персоналом медицинской организации, разработанное с использованием React, TypeScript и Vite.
 
-Currently, two official plugins are available:
+## 🌐 Демо
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [Vercel](https://test-frontend-bice.vercel.app/)
+- [GitHub Pages](https://saga6569.github.io/testFrontend/)
 
-## Expanding the ESLint configuration
+## 🚀 Технологии
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 18
+- TypeScript
+- Vite
+- Material-UI
+- MobX
+- React Hook Form
+- Yup
+- React DatePicker
+- Ky (HTTP клиент)
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 📋 Функциональность
+
+- Просмотр списка сотрудников
+- Добавление новых сотрудников
+- Редактирование данных сотрудников
+- Управление статусами сотрудников
+- Фильтрация по статусам (активные/уволенные/заблокированные)
+- Управление ролями и должностями
+
+## 🛠 Установка и запуск
+
+1. Клонируйте репозиторий:
+
+```bash
+git clone [url-репозитория]
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Установите зависимости:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+npm install
 ```
+
+3. Запустите приложение в режиме разработки:
+
+```bash
+npm run dev
+```
+
+4. Соберите приложение для продакшена:
+
+```bash
+npm run build
+```
+
+## 🧪 Тестирование
+
+Запуск тестов:
+
+```bash
+npm run test
+```
+
+## 📝 Линтинг
+
+Проверка кода линтером:
+
+```bash
+npm run lint
+```
+
+## 🔧 Структура проекта
+
+```
+src/
+├── components/     # React компоненты
+├── modals/        # Модальные окна
+├── services/      # Сервисы и API
+├── store/         # MobX store
+├── styles/        # Стили
+└── types/         # TypeScript типы
+```
+
+## 📦 Зависимости
+
+Основные зависимости проекта:
+
+- `@mui/material` - компоненты Material-UI
+- `@mui/icons-material` - иконки Material-UI
+- `mobx` - управление состоянием
+- `react-hook-form` - работа с формами
+- `yup` - валидация форм
+- `react-datepicker` - компонент выбора даты
+- `ky` - HTTP клиент
+
+## 🤝 Вклад в проект
+
+1. Создайте форк проекта
+2. Создайте ветку для ваших изменений (`git checkout -b feature/amazing-feature`)
+3. Зафиксируйте изменения (`git commit -m 'Add some amazing feature'`)
+4. Отправьте изменения в репозиторий (`git push origin feature/amazing-feature`)
+5. Откройте Pull Request
+

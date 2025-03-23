@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { employeeApi } from '../services/api'
-import { Employee, EmployeeFormData } from '../models/Employee'
+import { Employee, EmployeeFormData, EmployeeFormDataAdd } from '../types/Employee'
 
 class StaffStore {
  staffMembers: Employee[] = []
@@ -57,15 +57,17 @@ class StaffStore {
   this.showBlocked = !this.showBlocked
  }
 
- addStaffMember = async (member: EmployeeFormData) => {
+ addStaffMember = async (member: EmployeeFormDataAdd) => {
   try {
    this.isLoading = true
    const newMember = await employeeApi.create(member)
+   console.log(newMember)
    runInAction(() => {
     this.staffMembers.push(newMember)
     this.isLoading = false
    })
-  } catch {
+  } catch (error) {
+   console.log(error)
    runInAction(() => {
     this.error = 'Ошибка при добавлении сотрудника'
     this.isLoading = false
@@ -91,22 +93,23 @@ class StaffStore {
  }
 
  updateStaffMember = async (id: string, updates: Partial<EmployeeFormData>) => {
-  try {
-   this.isLoading = true
-   const updatedMember = await employeeApi.update(id, updates)
-   runInAction(() => {
-    const index = this.staffMembers.findIndex((member) => member.id === id)
-    if (index !== -1) {
-     this.staffMembers[index] = updatedMember
-    }
-    this.isLoading = false
-   })
-  } catch {
-   runInAction(() => {
-    this.error = 'Ошибка при обновлении данных сотрудника'
-    this.isLoading = false
-   })
-  }
+  console.log('обновление сотрудника', id, updates)
+  // try {
+  //  this.isLoading = true
+  //  const updatedMember = await employeeApi.update(id, updates)
+  //  runInAction(() => {
+  //   const index = this.staffMembers.findIndex((member) => member.id === id)
+  //   if (index !== -1) {
+  //    this.staffMembers[index] = updatedMember
+  //   }
+  //   this.isLoading = false
+  //  })
+  // } catch {
+  //  runInAction(() => {
+  //   this.error = 'Ошибка при обновлении данных сотрудника'
+  //   this.isLoading = false
+  //  })
+  // }
  }
 }
 

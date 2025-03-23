@@ -1,22 +1,22 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Table, TableBody } from '@mui/material'
-import StaffTableRow from '../StaffTableRow'
-import { staffStore } from '../../store/StaffStore'
+import StaffTableRow from '../src/components/StaffTableRow'
+import { staffStore } from '../src/store/StaffStore'
 
 // Мокаем store и модальные окна
-jest.mock('../../store/StaffStore', () => ({
+jest.mock('../src/store/StaffStore', () => ({
  staffStore: {
   removeStaffMember: jest.fn(),
  },
 }))
 
-jest.mock('../AddStaffModal', () => ({
+jest.mock('../src/modals/AddStaffModal', () => ({
  __esModule: true,
  default: () => null,
 }))
 
-jest.mock('../ConfirmationModal', () => ({
+jest.mock('../src/modals/ConfirmationModal', () => ({
  __esModule: true,
  default: ({ open }: { open: boolean }) =>
   open ? (

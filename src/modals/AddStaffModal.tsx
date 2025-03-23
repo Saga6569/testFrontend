@@ -13,16 +13,16 @@ import {
  InputLabel,
  FormHelperText,
 } from '@mui/material'
-import { ArrowBack } from '@mui/icons-material'
+import { ArrowBack, Close } from '@mui/icons-material'
 import DatePicker from 'react-datepicker'
 import { ru } from 'date-fns/locale'
-import 'react-datepicker/dist/react-datepicker.css'
 import { useForm, Controller } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PatternFormat } from 'react-number-format'
-import { Employee } from '../models/Employee'
+import { Employee, EmployeeFormDataAdd } from '../types/Employee'
 import { InferType } from 'yup'
+import { staffStore } from '../store/StaffStore'
 
 interface AddStaffModalProps {
  open: boolean
@@ -109,28 +109,55 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
 
  const onSubmit = (data: IFormInput) => {
   console.log(data)
-  // Здесь будет логика сохранения/обновления
+
+  const newData: EmployeeFormDataAdd = {
+   name: data.name,
+   surname: data.surname,
+   patronymic: data.patronymic,
+   email: data.email,
+   phone: data.phone,
+   department: data.department,
+   administrative_position: 'director',
+   medical_position: 'nurse',
+   is_simple_digital_sign_enabled: false,
+   hired_at: data.hireDate.getTime() / 1000,
+  }
+
+  console.log(newData)
+
+  staffStore.addStaffMember(newData)
   onClose()
  }
 
  return (
   <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
    <DialogTitle sx={{ p: 2, bgcolor: '#fff' }}>
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-     <IconButton onClick={onClose} size="small">
-      <ArrowBack />
-     </IconButton>
+    <Box
+     sx={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+     }}
+    >
      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <Box component="span" sx={{ color: '#666' }}>
-       Персонал
-      </Box>
-      <Box component="span" sx={{ color: '#666' }}>
-       /
-      </Box>
-      <Box component="span">
-       {isEdit ? 'Редактирование сотрудника' : 'Добавление нового сотрудника'}
+      <IconButton onClick={onClose} size="small">
+       <ArrowBack />
+      </IconButton>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+       <Box component="span" sx={{ color: '#666' }}>
+        Персонал
+       </Box>
+       <Box component="span" sx={{ color: '#666' }}>
+        /
+       </Box>
+       <Box component="span">
+        {isEdit ? 'Редактирование сотрудника' : 'Добавление нового сотрудника'}
+       </Box>
       </Box>
      </Box>
+     <IconButton onClick={onClose} size="small" sx={{ ml: 2 }}>
+      <Close />
+     </IconButton>
     </Box>
    </DialogTitle>
    <DialogContent sx={{ p: 3 }}>
@@ -354,8 +381,20 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
           onChange={(date: Date | null) => field.onChange(date || new Date())}
           dateFormat="dd.MM.yyyy"
           locale={ru}
-          placeholderText="Выберите дату"
-          customInput={<TextField fullWidth error={!!errors.hireDate} />}
+          placeholderText="Выберите дату приема на работу"
+          disabled={isEdit}
+          customInput={
+           <TextField
+            fullWidth
+            error={!!errors.hireDate}
+            label="Дата приема на работу"
+            helperText={
+             errors.hireDate?.message ||
+             'Укажите дату, когда сотрудник начал работу в организации'
+            }
+            disabled={isEdit}
+           />
+          }
          />
          {errors.hireDate && (
           <FormHelperText>{errors.hireDate.message}</FormHelperText>

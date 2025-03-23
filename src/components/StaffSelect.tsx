@@ -2,7 +2,7 @@ import React from 'react'
 import { Autocomplete, Chip, TextField, Box, Checkbox } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import { staffStore } from '../store/StaffStore'
-import { Employee } from '../models/Employee'
+import { Employee } from '../types/Employee'
 
 interface StaffSelectProps {
  selectedStaff: Employee[]

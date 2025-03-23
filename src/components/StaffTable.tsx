@@ -19,8 +19,7 @@ import {
 import { staffStore } from '../store/StaffStore'
 import StaffSelect from './StaffSelect'
 import StaffTableRow from './StaffTableRow'
-
-import AddStaffModal from './AddStaffModal'
+import AddStaffModal from '../modals/AddStaffModal'
 
 const StaffTable: React.FC = observer(() => {
  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
@@ -36,6 +35,8 @@ const StaffTable: React.FC = observer(() => {
  const handleCloseAddModal = () => {
   setIsAddModalOpen(false)
  }
+
+ console.log(staffStore.availableRoles)
 
  if (staffStore.isLoading) {
   return (

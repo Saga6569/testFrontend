@@ -15,9 +15,9 @@ import {
  Lock as LockIcon,
  ContentCopy as CopyIcon,
 } from '@mui/icons-material'
-import { Employee } from '../models/Employee'
-import ConfirmationModal, { ModalType } from './ConfirmationModal'
-import AddStaffModal from './AddStaffModal'
+import { Employee } from '../types/Employee'
+import ConfirmationModal, { ModalType } from '../modals/ConfirmationModal'
+import AddStaffModal from '../modals/AddStaffModal'
 import { staffStore } from '../store/StaffStore'
 
 interface StaffTableRowProps {

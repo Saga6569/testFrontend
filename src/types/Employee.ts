@@ -25,3 +25,16 @@ export interface Employee {
 }
 
 export type EmployeeFormData = Omit<Employee, 'id'>
+
+export interface EmployeeFormDataAdd {
+  name: string;
+  surname: string;
+  patronymic: string;
+  email: string;
+  phone: string;
+  department: string;
+  administrative_position: string;
+  medical_position: string;
+  is_simple_digital_sign_enabled: boolean;
+  hired_at: number;
+}

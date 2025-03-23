@@ -1,5 +1,6 @@
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import StaffTable from './components/StaffTable';
+import './styles/index.css';
 
 const theme = createTheme({
   palette: {
