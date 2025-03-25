@@ -105,10 +105,6 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
   }
  }
 
- //  const { statusResponse, error, massage } = staffStore
-
- //  console.log(statusResponse, error, massage)
-
  React.useEffect(() => {
   if (initialData && isEdit) {
    reset({
@@ -168,7 +164,11 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
     await staffStore.addStaffMember(newData)
 
     setNotification({ ...notification, open: true })
-    staffStore.statusResponse === 'success' && setTimeout(() => onClose(), 1000)
+    staffStore.statusResponse === 'success' &&
+     setTimeout(() => {
+      onClose()
+      reset()
+     }, 1000)
    }
   } catch (error) {
    console.log(error)
@@ -404,6 +404,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
           onChange={(date: Date | null) => field.onChange(date || new Date())}
           dateFormat="dd.MM.yyyy"
           locale={ru}
+          // maxDate={new Date(new Date().setDate(new Date().getDate() - 1))}
           placeholderText="Выберите дату приема на работу"
           disabled={isEdit}
           customInput={

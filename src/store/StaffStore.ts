@@ -81,7 +81,6 @@ class StaffStore {
  addStaffMember = async (member: EmployeeFormDataAdd) => {
   console.log('addStaffMember')
   try {
-   //  this.isLoading = true
    const newMember = await employeeApi.create(member)
    if (Object.prototype.hasOwnProperty.call(newMember, 'errors')) {
     console.log(newMember, ' newMember failed')
@@ -110,7 +109,6 @@ class StaffStore {
  removeStaffMember = async (id: string) => {
   console.log('сотрудника уволен', id)
   try {
-   //  this.isLoading = true
    await employeeApi.delete(id)
 
    runInAction(() => {

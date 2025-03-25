@@ -109,7 +109,7 @@ export const employeeApi = {
     const apiError = error as ApiError
     if (apiError.name === 'HTTPError') {
      const errorJson = await apiError.response.json()
-     throw errorJson
+     return errorJson
     }
    }
    throw error
