@@ -31,6 +31,11 @@ interface ApiResponse<T> {
  }
 }
 
+interface ApiError {
+ name: string
+ response: Response
+}
+
 export interface Department {
  id: string
  name: string
@@ -57,30 +62,37 @@ export const employeeApi = {
  async getAll(): Promise<ApiResponse<Employee[]>> {
   const url = 'api/v1/users'
 
-  let response
-
   try {
    const rawResponse = await api.get(url)
-   response = await rawResponse.json<ApiResponse<Employee[]>>()
-   console.log('JSON API response:', response)
+   const response = await rawResponse.json<ApiResponse<Employee[]>>()
    return response
-  } catch (error) {
-   console.warn(`URL ${url} не работает:`, error)
+  } catch (error: unknown) {
+   if (error && typeof error === 'object' && 'name' in error) {
+    const apiError = error as ApiError
+    if (apiError.name === 'HTTPError') {
+     const errorJson = await apiError.response.json()
+     throw errorJson
+    }
+   }
+   throw error
   }
-
-  console.warn('Не удалось получить данные из ответа:', response)
-  return { data: [] }
  },
 
  // Получение одного сотрудника по ID
- async getById(id: string): Promise<Employee> {
+ async getById(id: string): Promise<ApiResponse<Employee>> {
   try {
    const response = await api
     .get(`api/v1/users/${id}`)
     .json<ApiResponse<Employee>>()
    return response
-  } catch (error) {
-   console.error(`Ошибка при получении сотрудника с ID ${id}:`, error)
+  } catch (error: unknown) {
+   if (error && typeof error === 'object' && 'name' in error) {
+    const apiError = error as ApiError
+    if (apiError.name === 'HTTPError') {
+     const errorJson = await apiError.response.json()
+     throw errorJson
+    }
+   }
    throw error
   }
  },
@@ -91,12 +103,14 @@ export const employeeApi = {
    const response = await api
     .post('api/v1/users', { json: employee })
     .json<ApiResponse<Employee>>()
-
    return response
-  } catch (error) {
-   if (error.name === 'HTTPError') {
-    const errorJson = await error.response.json()
-    throw errorJson
+  } catch (error: unknown) {
+   if (error && typeof error === 'object' && 'name' in error) {
+    const apiError = error as ApiError
+    if (apiError.name === 'HTTPError') {
+     const errorJson = await apiError.response.json()
+     throw errorJson
+    }
    }
    throw error
   }
@@ -112,10 +126,13 @@ export const employeeApi = {
     .put(`api/v1/users/${id}`, { json: employee })
     .json<ApiResponse<Employee>>()
    return response.data
-  } catch (error) {
-   if (error.name === 'HTTPError') {
-    const errorJson = await error.response.json()
-    return errorJson
+  } catch (error: unknown) {
+   if (error && typeof error === 'object' && 'name' in error) {
+    const apiError = error as ApiError
+    if (apiError.name === 'HTTPError') {
+     const errorJson = await apiError.response.json()
+     throw errorJson
+    }
    }
    throw error
   }
@@ -124,13 +141,14 @@ export const employeeApi = {
  // Удаление сотрудника
  async delete(id: string): Promise<void> {
   try {
-   const response = await api.delete(`api/v1/users/${id}`)
-   console.log(response)
-  } catch (error) {
-   if (error.name === 'HTTPError') {
-    const errorJson = await error.response.json()
-    console.log(errorJson)
-    throw errorJson
+   await api.delete(`api/v1/users/${id}`)
+  } catch (error: unknown) {
+   if (error && typeof error === 'object' && 'name' in error) {
+    const apiError = error as ApiError
+    if (apiError.name === 'HTTPError') {
+     const errorJson = await apiError.response.json()
+     throw errorJson
+    }
    }
    throw error
   }
@@ -142,15 +160,13 @@ export const employeeApi = {
     .get('api/v1/departments')
     .json<ApiResponse<Department[]>>()
    return response
-  } catch (error) {
-   if (
-    error instanceof Error &&
-    'name' in error &&
-    error.name === 'HTTPError'
-   ) {
-    const errorJson = await (error as any).response.json()
-
-    throw errorJson
+  } catch (error: unknown) {
+   if (error && typeof error === 'object' && 'name' in error) {
+    const apiError = error as ApiError
+    if (apiError.name === 'HTTPError') {
+     const errorJson = await apiError.response.json()
+     throw errorJson
+    }
    }
    throw error
   }
@@ -160,11 +176,13 @@ export const employeeApi = {
   try {
    const response = await api.get('api/v1/roles').json<ApiResponse<Role[]>>()
    return response
-  } catch (error) {
-   if (error.name === 'HTTPError') {
-    const errorJson = await error.response.json()
-    console.log(errorJson)
-    throw errorJson
+  } catch (error: unknown) {
+   if (error && typeof error === 'object' && 'name' in error) {
+    const apiError = error as ApiError
+    if (apiError.name === 'HTTPError') {
+     const errorJson = await apiError.response.json()
+     throw errorJson
+    }
    }
    throw error
   }
@@ -176,11 +194,13 @@ export const employeeApi = {
     .get('api/v1/positions')
     .json<ApiResponse<Position[]>>()
    return response
-  } catch (error) {
-   if (error.name === 'HTTPError') {
-    const errorJson = await error.response.json()
-    console.log(errorJson)
-    throw errorJson
+  } catch (error: unknown) {
+   if (error && typeof error === 'object' && 'name' in error) {
+    const apiError = error as ApiError
+    if (apiError.name === 'HTTPError') {
+     const errorJson = await apiError.response.json()
+     throw errorJson
+    }
    }
    throw error
   }

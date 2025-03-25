@@ -86,9 +86,9 @@ describe('StaffTableRow', () => {
 
  it('вызывает removeStaffMember при нажатии на кнопку удаления', () => {
   renderWithTable(<StaffTableRow member={mockEmployee} />)
-  const deleteButton = screen.getByTestId('delete-button')
-  fireEvent.click(deleteButton)
-  expect(staffStore.removeStaffMember).toHaveBeenCalledWith(mockEmployee.id)
+  const fireButton = screen.getByTestId('fire-button')
+  fireEvent.click(fireButton)
+  expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument()
  })
 
  it('открывает модальное окно подтверждения при нажатии на кнопку увольнения', () => {

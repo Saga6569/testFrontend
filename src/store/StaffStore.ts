@@ -17,20 +17,24 @@ class StaffStore {
  departments: Department[] = []
  roles: Role[] = []
  positions: Position[] = []
-
+ statusResponse: 'success' | 'failed' | null = null
+ massage: string | null = null
  constructor() {
   makeAutoObservable(this)
  }
 
  fetchStaff = async () => {
   try {
-   this.isLoading = true
-   this.error = null
+   runInAction(() => {
+    this.isLoading = true
+    this.error = null
+   })
+
    const responsesStaff = await employeeApi.getAll()
    const responsesDepartments = await employeeApi.getDepartments()
    const responseRoles = await employeeApi.getRoles()
    const responsePositions = await employeeApi.getPositions()
-   console.log(responsePositions)
+
    runInAction(() => {
     this.staffMembers = (
      responsesStaff.data as unknown as { items: Employee[] }
@@ -39,42 +43,66 @@ class StaffStore {
     this.roles = responseRoles.data.items
     this.positions = responsePositions.data.items
     this.isLoading = false
+    this.statusResponse = 'success'
    })
-  } catch {
+  } catch (error) {
    runInAction(() => {
     this.error = 'Ошибка при загрузке данных'
     this.isLoading = false
+    this.statusResponse = 'failed'
    })
   }
  }
 
  setSelectedStaff = (staff: Pick<Employee, 'id' | 'name' | 'roles'>[]) => {
-  this.selectedStaff = staff
+  runInAction(() => {
+   this.selectedStaff = staff
+  })
  }
 
  setSelectedRoles = (roles: string[]) => {
-  this.selectedRoles = roles
+  runInAction(() => {
+   this.selectedRoles = roles
+  })
  }
 
  toggleDismissed = () => {
-  this.showDismissed = !this.showDismissed
+  runInAction(() => {
+   this.showDismissed = !this.showDismissed
+  })
  }
 
  toggleBlocked = () => {
-  this.showBlocked = !this.showBlocked
+  runInAction(() => {
+   this.showBlocked = !this.showBlocked
+  })
  }
 
  addStaffMember = async (member: EmployeeFormDataAdd) => {
+  console.log('addStaffMember')
   try {
    //  this.isLoading = true
    const newMember = await employeeApi.create(member)
-   runInAction(() => {
-    // this.isLoading = false
-   })
+   if (Object.prototype.hasOwnProperty.call(newMember, 'errors')) {
+    console.log(newMember, ' newMember failed')
+    runInAction(() => {
+     this.statusResponse = 'failed'
+     this.massage = Object.entries(newMember.errors)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join('\n')
+    })
+   }
+   if (!Object.prototype.hasOwnProperty.call(newMember, 'errors')) {
+    console.log(newMember, ' newMember success')
+    runInAction(() => {
+     this.statusResponse = 'success'
+     this.massage = `Сотрудник успешно добавлен id: ${newMember.data.id}`
+    })
+   }
   } catch (error) {
-   console.log(error)
    runInAction(() => {
-    // this.isLoading = false
+    this.statusResponse = 'failed'
+    console.log(error)
    })
   }
  }
@@ -106,22 +134,35 @@ class StaffStore {
  }
 
  updateStaffMember = async (id: string, updates: Partial<EmployeeFormData>) => {
+  console.log('updateStaffMember')
   try {
    //  this.isLoading = true
    const updatedMember = await employeeApi.update(id, updates)
-   console.log(updatedMember)
-   //  runInAction(() => {
-   //   const index = this.staffMembers.findIndex((member) => member.id === id)
-   //   if (index !== -1) {
-   //    this.staffMembers[index] = updatedMember
-   //   }
-   //  })
+
+   if (Object.prototype.hasOwnProperty.call(updatedMember, 'errors')) {
+    runInAction(() => {
+     this.statusResponse = 'failed'
+     this.massage = Object.entries(updatedMember.errors)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join('\n')
+    })
+   }
+   if (!Object.prototype.hasOwnProperty.call(updatedMember, 'errors')) {
+    console.log(updatedMember, ' updatedMember success')
+    runInAction(() => {
+     this.statusResponse = 'success'
+     this.massage = `Сотрудник успешно обновлен id: ${id}`
+     this.staffMembers = this.staffMembers.map((member) =>
+      member.id === id ? updatedMember : member
+     )
+    })
+   }
   } catch (error) {
-   console.log(error)
-   //  runInAction(() => {
-   //   this.error = 'Ошибка при обновлении данных сотрудника'
-   //   this.isLoading = false
-   //  })
+   runInAction(() => {
+    this.statusResponse = 'failed'
+    console.log(error)
+   })
+   return error
   }
  }
 }

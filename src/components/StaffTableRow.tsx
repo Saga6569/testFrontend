@@ -9,12 +9,7 @@ import {
  Tooltip,
  Button,
 } from '@mui/material'
-import {
- Edit as EditIcon,
- Delete as DeleteIcon,
- Lock as LockIcon,
- ContentCopy as CopyIcon,
-} from '@mui/icons-material'
+import { Edit as EditIcon, ContentCopy as CopyIcon } from '@mui/icons-material'
 import { Employee } from '../types/Employee'
 import ConfirmationModal, { ModalType } from '../modals/ConfirmationModal'
 import AddStaffModal from '../modals/AddStaffModal'
