@@ -10,7 +10,12 @@ import {
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 
-export type ModalType = 'fire' | 'blocking' | 'delete' | 'CannotDelete'
+export type ModalType =
+ | 'fire'
+ | 'blocking'
+ | 'delete'
+ | 'CannotDelete'
+ | undefined
 
 interface ConfirmationModalProps {
  open: boolean
@@ -56,7 +61,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
  onConfirm,
  typeModal,
 }) => {
- if (!typeModal) {
+ console.log(typeModal)
+ if (typeModal === undefined) {
   return null
  }
 

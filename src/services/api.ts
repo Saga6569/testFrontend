@@ -1,5 +1,9 @@
 import ky from 'ky'
-import { Employee, EmployeeFormData, EmployeeFormDataAdd } from '../types/Employee'
+import {
+ Employee,
+ EmployeeFormData,
+ EmployeeFormDataAdd,
+} from '../types/Employee'
 
 // Базовый URL API
 const API_URL = 'https://api.mock.sb21.ru'
@@ -27,6 +31,27 @@ interface ApiResponse<T> {
  }
 }
 
+export interface Department {
+ id: string
+ name: string
+ code: string
+ status: {
+  label: string
+  value: string
+ }
+}
+
+export interface Role {
+ id: string
+ name: string
+ code: string
+}
+
+export interface Position {
+ id: string
+ name: string
+ code: string
+}
 
 export const employeeApi = {
  async getAll(): Promise<ApiResponse<Employee[]>> {
@@ -53,7 +78,7 @@ export const employeeApi = {
    const response = await api
     .get(`api/v1/users/${id}`)
     .json<ApiResponse<Employee>>()
-   return response.data
+   return response
   } catch (error) {
    console.error(`Ошибка при получении сотрудника с ID ${id}:`, error)
    throw error
@@ -61,14 +86,18 @@ export const employeeApi = {
  },
 
  // Создание нового сотрудника
- async create(employee: EmployeeFormDataAdd): Promise<Employee> {
+ async create(employee: EmployeeFormDataAdd): Promise<ApiResponse<Employee>> {
   try {
    const response = await api
     .post('api/v1/users', { json: employee })
     .json<ApiResponse<Employee>>()
-   return response.data
+
+   return response
   } catch (error) {
-   console.error('Ошибка при создании сотрудника:', error)
+   if (error.name === 'HTTPError') {
+    const errorJson = await error.response.json()
+    throw errorJson
+   }
    throw error
   }
  },
@@ -84,7 +113,10 @@ export const employeeApi = {
     .json<ApiResponse<Employee>>()
    return response.data
   } catch (error) {
-   console.error(`Ошибка при обновлении сотрудника с ID ${id}:`, error)
+   if (error.name === 'HTTPError') {
+    const errorJson = await error.response.json()
+    return errorJson
+   }
    throw error
   }
  },
@@ -92,26 +124,81 @@ export const employeeApi = {
  // Удаление сотрудника
  async delete(id: string): Promise<void> {
   try {
-   await api.delete(`api/v1/users/${id}`)
+   const response = await api.delete(`api/v1/users/${id}`)
+   console.log(response)
   } catch (error) {
-   console.error(`Ошибка при удалении сотрудника с ID ${id}:`, error)
+   if (error.name === 'HTTPError') {
+    const errorJson = await error.response.json()
+    console.log(errorJson)
+    throw errorJson
+   }
+   throw error
+  }
+ },
+
+ async getDepartments(): Promise<ApiResponse<Department[]>> {
+  try {
+   const response = await api
+    .get('api/v1/departments')
+    .json<ApiResponse<Department[]>>()
+   return response
+  } catch (error) {
+   if (
+    error instanceof Error &&
+    'name' in error &&
+    error.name === 'HTTPError'
+   ) {
+    const errorJson = await (error as any).response.json()
+
+    throw errorJson
+   }
+   throw error
+  }
+ },
+
+ async getRoles(): Promise<ApiResponse<Role[]>> {
+  try {
+   const response = await api.get('api/v1/roles').json<ApiResponse<Role[]>>()
+   return response
+  } catch (error) {
+   if (error.name === 'HTTPError') {
+    const errorJson = await error.response.json()
+    console.log(errorJson)
+    throw errorJson
+   }
+   throw error
+  }
+ },
+
+ async getPositions(): Promise<ApiResponse<Position[]>> {
+  try {
+   const response = await api
+    .get('api/v1/positions')
+    .json<ApiResponse<Position[]>>()
+   return response
+  } catch (error) {
+   if (error.name === 'HTTPError') {
+    const errorJson = await error.response.json()
+    console.log(errorJson)
+    throw errorJson
+   }
    throw error
   }
  },
 
  // Изменение статуса сотрудника (блокировка/разблокировка)
- async changeStatus(
-  id: string,
-  status: 'active' | 'blocked'
- ): Promise<Employee> {
-  try {
-   const response = await api
-    .patch(`api/v1/users/${id}/status`, { json: { status } })
-    .json<ApiResponse<Employee>>()
-   return response.data
-  } catch (error) {
-   console.error(`Ошибка при изменении статуса сотрудника с ID ${id}:`, error)
-   throw error
-  }
- },
+ //  async changeStatus(
+ //   id: string,
+ //   status: 'active' | 'blocked'
+ //  ): Promise<Employee> {
+ //   try {
+ //    const response = await api
+ //     .patch(`api/v1/users/${id}/status`, { json: { status } })
+ //     .json<ApiResponse<Employee>>()
+ //    return response.data
+ //   } catch (error) {
+ //    console.error(`Ошибка при изменении статуса сотрудника с ID ${id}:`, error)
+ //    throw error
+ //   }
+ //  },
 }

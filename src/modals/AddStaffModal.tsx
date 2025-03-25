@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FormEvent } from 'react'
 import {
  Dialog,
  DialogTitle,
@@ -20,7 +20,11 @@ import { useForm, Controller } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PatternFormat } from 'react-number-format'
-import { Employee, EmployeeFormDataAdd } from '../types/Employee'
+import {
+ Employee,
+ EmployeeFormDataAdd,
+ EmployeeFormData,
+} from '../types/Employee'
 import { InferType } from 'yup'
 import { staffStore } from '../store/StaffStore'
 
@@ -53,6 +57,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
  isEdit = false,
 }) => {
  const {
+  register,
   control,
   handleSubmit,
   formState: { errors },
@@ -86,6 +91,12 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
   resolver: yupResolver<IFormInput>(validationSchema),
  })
 
+ function stopPropagate(callback: (event: FormEvent<HTMLFormElement>) => void) {
+  return (e: FormEvent<HTMLFormElement>) => {
+   e.stopPropagation()
+   callback(e)
+  }
+ }
  React.useEffect(() => {
   if (initialData && isEdit) {
    reset({
@@ -107,26 +118,41 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
   }
  }, [initialData, isEdit, reset])
 
- const onSubmit = (data: IFormInput) => {
-  console.log(data)
+ const onSubmit = async (data: IFormInput) => {
+  if (isEdit && initialData) {
+   const updateData: Partial<EmployeeFormData> = {
+    name: data.name,
+    surname: data.surname,
+    patronymic: data.patronymic,
+    email: data.email,
+    phone: data.phone,
+    department: data.department,
+    administrative_position: data.adminPosition,
+    medical_position: data.medicalPosition,
+    is_simple_digital_sign_enabled: false,
+    hired_at: data.hireDate.getTime() / 1000,
+    roles: data.roles,
+   }
 
-  const newData: EmployeeFormDataAdd = {
-   name: data.name,
-   surname: data.surname,
-   patronymic: data.patronymic,
-   email: data.email,
-   phone: data.phone,
-   department: data.department,
-   administrative_position: 'director',
-   medical_position: 'nurse',
-   is_simple_digital_sign_enabled: false,
-   hired_at: data.hireDate.getTime() / 1000,
+   console.log(updateData)
+   await staffStore.updateStaffMember(initialData.id, updateData)
+  } else {
+   const newData: EmployeeFormDataAdd = {
+    name: data.name,
+    surname: data.surname,
+    patronymic: data.patronymic,
+    email: data.email,
+    phone: data.phone,
+    department: data.department,
+    administrative_position: data.adminPosition,
+    medical_position: data.medicalPosition,
+    is_simple_digital_sign_enabled: false,
+    hired_at: data.hireDate.getTime() / 1000,
+   }
+
+   console.log(newData)
+   await staffStore.addStaffMember(newData)
   }
-
-  console.log(newData)
-
-  staffStore.addStaffMember(newData)
-  onClose()
  }
 
  return (
@@ -161,58 +187,43 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
     </Box>
    </DialogTitle>
    <DialogContent sx={{ p: 3 }}>
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mb: 4 }}>
+    <form
+     onSubmit={stopPropagate(handleSubmit(onSubmit))}
+     style={{ marginBottom: '32px' }}
+    >
      <Box component="h2" sx={{ fontSize: 24, fontWeight: 400, mb: 3 }}>
       Основные данные сотрудника
      </Box>
      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-      <Controller
-       name="surname"
-       control={control}
-       render={({ field }) => (
-        <TextField
-         {...field}
-         fullWidth
-         label="Фамилия"
-         placeholder="Введите Фамилию"
-         size="small"
-         error={!!errors.surname}
-         helperText={errors.surname?.message}
-         sx={{ bgcolor: '#fff' }}
-        />
-       )}
+      <TextField
+       {...register('surname')}
+       fullWidth
+       label="Фамилия"
+       placeholder="Введите Фамилию"
+       size="small"
+       error={!!errors.surname}
+       helperText={errors.surname?.message}
+       sx={{ bgcolor: '#fff' }}
       />
-      <Controller
-       name="name"
-       control={control}
-       render={({ field }) => (
-        <TextField
-         {...field}
-         fullWidth
-         label="Имя"
-         placeholder="Введите Имя"
-         size="small"
-         error={!!errors.name}
-         helperText={errors.name?.message}
-         sx={{ bgcolor: '#fff' }}
-        />
-       )}
+      <TextField
+       {...register('name')}
+       fullWidth
+       label="Имя"
+       placeholder="Введите Имя"
+       size="small"
+       error={!!errors.name}
+       helperText={errors.name?.message}
+       sx={{ bgcolor: '#fff' }}
       />
-      <Controller
-       name="patronymic"
-       control={control}
-       render={({ field }) => (
-        <TextField
-         {...field}
-         fullWidth
-         label="Отчество"
-         placeholder="Введите Отчество"
-         size="small"
-         error={!!errors.patronymic}
-         helperText={errors.patronymic?.message}
-         sx={{ bgcolor: '#fff' }}
-        />
-       )}
+      <TextField
+       {...register('patronymic')}
+       fullWidth
+       label="Отчество"
+       placeholder="Введите Отчество"
+       size="small"
+       error={!!errors.patronymic}
+       helperText={errors.patronymic?.message}
+       sx={{ bgcolor: '#fff' }}
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
        <FormControl
@@ -222,16 +233,18 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
         error={!!errors.adminPosition}
        >
         <InputLabel>Административная должность</InputLabel>
-        <Controller
-         name="adminPosition"
-         control={control}
-         render={({ field }) => (
-          <Select {...field} label="Административная должность">
-           <MenuItem value="head">Руководитель МО</MenuItem>
-           <MenuItem value="admin">Администратор клиники</MenuItem>
-          </Select>
-         )}
-        />
+        <Select
+         {...register('adminPosition')}
+         label="Административная должность"
+        >
+         {staffStore.positions
+          .filter((position) => position.type === 'administrative')
+          .map((position) => (
+           <MenuItem key={position.id} value={position.value}>
+            {position.label}
+           </MenuItem>
+          ))}
+        </Select>
         {errors.adminPosition && (
          <FormHelperText>{errors.adminPosition.message}</FormHelperText>
         )}
@@ -251,9 +264,9 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
            {...field}
            multiple
            label="Роли"
-           value={field.value.filter(
-            (role): role is string => role !== undefined
-           )}
+           value={
+            field.value?.filter((v): v is string => v !== undefined) || []
+           }
            renderValue={(selected: string[]) => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
              {selected.map((value: string) => (
@@ -278,11 +291,11 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
             </Box>
            )}
           >
-           <MenuItem value="Руководитель МО">Руководитель МО</MenuItem>
-           <MenuItem value="Администратор клиники">
-            Администратор клиники
-           </MenuItem>
-           <MenuItem value="Уполномоченное лицо">Уполномоченное лицо</MenuItem>
+           {staffStore.roles.map((role) => (
+            <MenuItem key={role.id} value={role.label}>
+             {role.label}
+            </MenuItem>
+           ))}
           </Select>
          )}
         />
@@ -298,16 +311,15 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
        sx={{ bgcolor: '#fff' }}
       >
        <InputLabel>Медицинская должность</InputLabel>
-       <Controller
-        name="medicalPosition"
-        control={control}
-        render={({ field }) => (
-         <Select {...field} label="Медицинская должность">
-          <MenuItem value="doctor">Врач</MenuItem>
-          <MenuItem value="nurse">Медсестра</MenuItem>
-         </Select>
-        )}
-       />
+       <Select {...register('medicalPosition')} label="Медицинская должность">
+        {staffStore.positions
+         .filter((position) => position.type === 'medical')
+         .map((position) => (
+          <MenuItem key={position.id} value={position.value}>
+           {position.label}
+          </MenuItem>
+         ))}
+       </Select>
        {errors.medicalPosition && (
         <FormHelperText>{errors.medicalPosition.message}</FormHelperText>
        )}
@@ -319,16 +331,13 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
        sx={{ bgcolor: '#fff' }}
       >
        <InputLabel>Подразделение</InputLabel>
-       <Controller
-        name="department"
-        control={control}
-        render={({ field }) => (
-         <Select {...field} label="Подразделение">
-          <MenuItem value="therapy">Терапевтическое отделение</MenuItem>
-          <MenuItem value="surgery">Хирургическое отделение</MenuItem>
-         </Select>
-        )}
-       />
+       <Select {...register('department')} label="Подразделение">
+        {staffStore.departments.map((department) => (
+         <MenuItem key={department.id} value={department.value}>
+          {department.label}
+         </MenuItem>
+        ))}
+       </Select>
        {errors.department && (
         <FormHelperText>{errors.department.message}</FormHelperText>
        )}
@@ -355,51 +364,40 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
         />
        )}
       />
-      <Controller
-       name="email"
-       control={control}
-       render={({ field }) => (
-        <TextField
-         {...field}
-         fullWidth
-         label="E-mail"
-         placeholder="Введите ваш E-mail"
-         size="small"
-         error={!!errors.email}
-         helperText={errors.email?.message}
-         sx={{ bgcolor: '#fff' }}
-        />
-       )}
+      <TextField
+       {...register('email')}
+       fullWidth
+       label="E-mail"
+       placeholder="Введите ваш E-mail"
+       size="small"
+       error={!!errors.email}
+       helperText={errors.email?.message}
+       sx={{ bgcolor: '#fff' }}
       />
       <Controller
        name="hireDate"
        control={control}
        render={({ field }) => (
-        <FormControl fullWidth error={!!errors.hireDate}>
-         <DatePicker
-          selected={field.value instanceof Date ? field.value : null}
-          onChange={(date: Date | null) => field.onChange(date || new Date())}
-          dateFormat="dd.MM.yyyy"
-          locale={ru}
-          placeholderText="Выберите дату приема на работу"
-          disabled={isEdit}
-          customInput={
-           <TextField
-            fullWidth
-            error={!!errors.hireDate}
-            label="Дата приема на работу"
-            helperText={
-             errors.hireDate?.message ||
-             'Укажите дату, когда сотрудник начал работу в организации'
-            }
-            disabled={isEdit}
-           />
-          }
-         />
-         {errors.hireDate && (
-          <FormHelperText>{errors.hireDate.message}</FormHelperText>
-         )}
-        </FormControl>
+        <DatePicker
+         selected={field.value instanceof Date ? field.value : null}
+         onChange={(date: Date | null) => field.onChange(date || new Date())}
+         dateFormat="dd.MM.yyyy"
+         locale={ru}
+         placeholderText="Выберите дату приема на работу"
+         disabled={isEdit}
+         customInput={
+          <TextField
+           fullWidth
+           error={!!errors.hireDate}
+           label="Дата приема на работу"
+           helperText={
+            errors.hireDate?.message ||
+            'Укажите дату, когда сотрудник начал работу в организации'
+           }
+           disabled={isEdit}
+          />
+         }
+        />
        )}
       />
      </Box>
@@ -420,7 +418,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({
        Сохранить изменения
       </Button>
      </Box>
-    </Box>
+    </form>
    </DialogContent>
   </Dialog>
  )

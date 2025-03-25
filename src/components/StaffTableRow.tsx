@@ -29,7 +29,7 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
  const [emailTooltipOpen, setEmailTooltipOpen] = React.useState(false)
  const [dismissModalOpen, setDismissModalOpen] = React.useState(false)
  const [editModalOpen, setEditModalOpen] = React.useState(false)
- const [typeModal, setTypeModal] = React.useState<ModalType>('fire')
+ const [typeModal, setTypeModal] = React.useState<ModalType>()
 
  const copyToClipboard = (text: string, type: 'phone' | 'email') => {
   navigator.clipboard.writeText(text)
@@ -139,10 +139,6 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
    )
   }
   return null
- }
-
- const handleDismiss = () => {
-  setDismissModalOpen(false)
  }
 
  const tableRowContent = (
@@ -303,31 +299,37 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
     >
      <EditIcon />
     </IconButton>
-    <IconButton
+    {/* <IconButton
      size="small"
      onClick={() => {
       setTypeModal('delete')
-      staffStore.removeStaffMember(member.id)
       setDismissModalOpen(true)
      }}
      data-testid="delete-button"
      aria-label="Удалить сотрудника"
     >
      <DeleteIcon />
-    </IconButton>
-    <IconButton
+    </IconButton> */}
+    {/* <IconButton
      size="small"
      onClick={() => {
       setTypeModal('blocking')
-      setDismissModalOpen(true)
+      // setDismissModalOpen(true)
      }}
      aria-label="Заблокировать сотрудника"
     >
      <LockIcon />
-    </IconButton>
+    </IconButton> */}
    </TableCell>
   </TableRow>
  )
+
+ const confirmMap = {
+  fire: () => {
+   staffStore.removeStaffMember(member.id)
+   setDismissModalOpen(false)
+  },
+ }
 
  return (
   <>
@@ -337,7 +339,7 @@ const StaffTableRow: React.FC<StaffTableRowProps> = ({ member }) => {
      <ConfirmationModal
       open={dismissModalOpen}
       onClose={() => setDismissModalOpen(false)}
-      onConfirm={handleDismiss}
+      onConfirm={confirmMap[typeModal as keyof typeof confirmMap]}
       typeModal={typeModal}
       data-testid="confirmation-modal"
      />
